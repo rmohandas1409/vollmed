@@ -15,6 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
+/*
+* Como se trata de uma classe de configuração colocamos a anotation @Configuration.
+* @EnableWebSecurity está anotation informamos ao spring que vamos personalizar as configurações de segurança.
+* */
 @Configuration
 @EnableWebSecurity
 //@EnableMethodSecurity(securedEnabled = true)
@@ -23,8 +28,11 @@ public class SecurityConfigurations {
     @Autowired
     private SecurityFilter securityFilter;
 
+    //Metodo de configuração de autenticação e autorização.
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        //http.csrf().disable() desabilita defesa conta ataque Cross-Site Request Forgery
+        //pois como estamos utilizando autenticação via token o mesmo ja realiza isto.
         return http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests()
@@ -33,6 +41,7 @@ public class SecurityConfigurations {
                  // Metodo para liberar acesso a metodo com perfil de admin
                  //.antMatchers(HttpMethod.DELETE, "/medicos").hasRole("ADMIN")
                 //.antMatchers(HttpMethod.DELETE, "/pacientes").hasRole("ADMIN")
+                //.anyRequest().authenticated() as demais url da api tem quem estar autenticado para executar.
                 .anyRequest().authenticated()
                 .and().addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
